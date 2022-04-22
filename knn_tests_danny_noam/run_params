@@ -1,0 +1,10 @@
+example_input_1: k=13, max_iter=434
+example_input_2: k=16, max_iter=200
+example_input_3: k=22, max_iter=849
+example_input_4: k=21, max_iter=200
+example_input_5: k=30, max_iter=200
+example_input_6: k=3, max_iter=8
+example_input_7: k=11, max_iter=200
+example_input_8: k=11, max_iter=401
+example_input_9: k=26, max_iter=672
+example_input_10: k=18, max_iter=200
