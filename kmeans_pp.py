@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import sys
+from os.path import exists
+from os import remove
 
 DEFAULT_MAX_ITER = 100
 DEBUG = True
@@ -33,17 +35,16 @@ def get_program_args():
 
 def read_data(filename1, filename2):
     df1 = pd.read_csv(filename1, header=None)
-    df1.columns= [str(i) for i in range(len(df1.columns))]
+    df1.columns = [str(i) for i in range(len(df1.columns))]
     df2 = pd.read_csv(filename2, header=None)
     df2.columns = [str(i) for i in range(len(df2.columns))]
     res = pd.merge(df1, df2, on="0")
-    res.sort_values( "0", inplace= True)
+    res.sort_values("0", inplace=True)
     res.drop("0", inplace=True, axis=1)
     return res.to_numpy()
 
 
 def initialize_centroids(vectors: np.ndarray, k: int):
-    np.random.seed(0)
     N = vectors.shape[0]
     centroids_indices = np.zeros(k, dtype="int32")
     centroids_indices[0] = np.random.randint(0, N)
@@ -67,9 +68,13 @@ def create_c_input(vectors: np.ndarray, centroids_indices: np.ndarray):
     """
     N = vectors.shape[0]
     try:
-        sorted_vectors = [list(vectors[i]) for i in centroids_indices] + [list(vectors[i]) for i in range(N) if i not in centroids_indices]
+        sorted_vectors = [list(vectors[i]) for i in centroids_indices] + [list(vectors[i]) for i in range(N) if
+                                                                          i not in centroids_indices]
         sorted_vectors = [[format(x, '.4f') for x in i] for i in sorted_vectors]
-        with open("c_input_file", 'w+') as c_input:
+        if exists("c_input_file.txt"):
+            remove("c_input_file.txt")
+
+        with open("c_input_file.txt", 'w+') as c_input:
             for vec in sorted_vectors:
                 c_input.write(",".join(vec) + "\n")
     except Exception as err:
@@ -80,16 +85,13 @@ def create_c_input(vectors: np.ndarray, centroids_indices: np.ndarray):
 
 
 def main():
-    # print(get_program_args(), "\n")
     np.random.seed(0)
-    k = 3
-    N = 100
-    d = 7
-    # create_c_input(vectors, centroids_indices)
-
-    centroids_indices = initialize_centroids(read_data("input_1_db_1.txt", "input_1_db_2.txt"), k)
-    print("indices: ", centroids_indices)
-
+    [k, max_iter, eps, filename1, filename2] = get_program_args()
+    vectors = read_data(filename1, filename2)  # get ndarray of input vectors, sorted by index
+    centroids_indices = initialize_centroids(vectors, k) # get ndarray of k indices corresponding to vecrors that are chosen to the init
+    create_c_input(vectors, centroids_indices) # write to txt file list of vectors s.t first k vectors are init vectors
+    # invoke c code
+    # print results to console
 
 
 if __name__ == '__main__':
