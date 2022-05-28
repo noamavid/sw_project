@@ -3,6 +3,7 @@ import pandas as pd
 import sys
 from os.path import exists
 from os import remove
+from kmeans_capi import kmeans_capi
 
 DEFAULT_MAX_ITER = 100
 DEBUG = True
@@ -90,7 +91,8 @@ def main():
     vectors = read_data(filename1, filename2)  # get ndarray of input vectors, sorted by index
     centroids_indices = initialize_centroids(vectors, k) # get ndarray of k indices corresponding to vecrors that are chosen to the init
     create_c_input(vectors, centroids_indices) # write to txt file list of vectors s.t first k vectors are init vectors
-    # invoke c code
+    result = kmeans_capi(k, eps, max_iter)
+    # @Todo: make sure c_api returns status code
     # print results to console
 
 
